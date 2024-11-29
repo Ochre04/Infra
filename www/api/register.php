@@ -1,11 +1,11 @@
 <?php
-$servername = "localhost"; // server
-$username = "root"; // user
-$password = ""; // pw
-$dbname = "ctf_website"; // db
+$db_host = "postgres";
+$db_name = "ctf";
+$db_username = "ctf";
+$db_password = "cce19de2cb307a05ed4f95a2092a98a0c436ac58a303f7fcc7afec2916378cb5";
 
 // connect
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli(db_host, $username, $password, $db_name);
 
 if ($conn->connect_error) {
     die("Verbindung fehlgeschlagen: " . $conn->connect_error);
