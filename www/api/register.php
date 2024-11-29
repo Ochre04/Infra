@@ -4,7 +4,6 @@ $db_name = "ctf";
 $db_username = "ctf";
 $db_password = "cce19de2cb307a05ed4f95a2092a98a0c436ac58a303f7fcc7afec2916378cb5";
 
-// connect
 $pdo = new PDO("pgsql:host=$db_host;dbname=$db_name", $db_username, $db_password);
 
 $init = "
@@ -37,15 +36,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // encrypt pw
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    $hashed_password = password_hash($password, PASSWORD_ARGON2I);;
 
     // data insert
-    $sql = "INSERT INTO users (username, password) VALUES (:username, :password)";
+    $sql = "INSERT INTO users (username, password) VALUES (:username, :hashed_password)";
     $stmt = $pdo->prepare($sql);
 
     // Bind parameters
     $stmt->bindParam(':username', $username);
-    $stmt->bindParam(':password', $password);
+    $stmt->bindParam(':hashed_password', $hashed_password);
 
     if ($stmt->execute() === true) {
       header("Location: /api/login.php");
@@ -59,27 +58,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrieren</title>
-</head>
-<body>
-    <h2>Registrieren für das CTF</h2>
-    <form method="post" action="register.php">
-        <label for="username">Benutzername:</label>
-        <input type="text" id="username" name="username" required><br><br>
-
-        <label for="password">Passwort:</label>
-        <input type="password" id="password" name="password" required><br><br>
-
-        <label for="password_confirm">Passwort bestätigen:</label>
-        <input type="password" id="password_confirm" name="password_confirm" required><br><br>
-
-        <input type="submit" value="Registrieren">
-    </form>
-</body>
-</html>
