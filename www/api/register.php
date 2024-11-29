@@ -5,39 +5,59 @@ $db_username = "ctf";
 $db_password = "cce19de2cb307a05ed4f95a2092a98a0c436ac58a303f7fcc7afec2916378cb5";
 
 // connect
-$conn = new mysqli(db_host, $username, $password, $db_name);
+$pdo = new PDO("pgsql:host=$db_host;dbname=$db_name", $db_username, $db_password);
 
-if ($conn->connect_error) {
-    die("Verbindung fehlgeschlagen: " . $conn->connect_error);
-}
+$init = "
+  CREATE TABLE IF NOT EXISTS users (
+    username TEXT PRIMARY KEY NOT NULL,
+    password TEXT NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS active_challenges (
+    id TEXT PRIMARY KEY NOT NULL,
+    flag TEXT NOT NULL,
+    username TEXT NOT NULL
+  );
+";
+$pdo->exec($init);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // user input
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
-    $password_confirm = mysqli_real_escape_string($conn, $_POST['password_confirm']);
-    
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $password_confirm = $_POST['password_confirm'];
+
     // pw check
     if ($password !== $password_confirm) {
-        echo "Die Passwörter stimmen nicht überein.";
+	$result = (object) array(
+          'status' => true,
+          'msg' => "Die Passwörter stimmen nicht überein.",
+        );
+        echo json_encode($result);
         exit;
     }
 
     // encrypt pw
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    
+
     // data insert
-    $sql = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
-    
-    if ($conn->query($sql) === TRUE) {
-        echo "Registrierung erfolgreich!";
+    $sql = "INSERT INTO users (username, password) VALUES (:username, :password)";
+    $stmt = $pdo->prepare($sql);
+
+    // Bind parameters
+    $stmt->bindParam(':username', $username);
+    $stmt->bindParam(':password', $password);
+
+    if ($stmt->execute() === true) {
+      header("Location: /api/login.php");
+      exit();
     } else {
-        echo "Fehler: " . $sql . "<br>" . $conn->error;
+	$result = (object) array(
+          'status' => true,
+          'msg' => "Benutzer existiert bereits.",
+        );
+        echo json_encode($result);
     }
 }
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -52,9 +72,6 @@ $conn->close();
     <form method="post" action="register.php">
         <label for="username">Benutzername:</label>
         <input type="text" id="username" name="username" required><br><br>
-
-        <label for="email">E-Mail:</label>
-        <input type="email" id="email" name="email" required><br><br>
 
         <label for="password">Passwort:</label>
         <input type="password" id="password" name="password" required><br><br>
