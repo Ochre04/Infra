@@ -79,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 		$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-		if ($row) {
+		if (is_null($row)) {
 			if ($password !== $password_confirm) {
 				$result = (object) [
 					"success" => false,
