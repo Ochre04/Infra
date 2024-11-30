@@ -77,9 +77,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$stmt->bindParam(":username", $username);
 		$stmt->execute();
 
-		$row = $stmt->fetch();
+		$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-		if (is_null($row)) {
+		if ($row) {
 			if ($password !== $password_confirm) {
 				$result = (object) [
 					"success" => false,
