@@ -35,16 +35,16 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 			header("Content-Length: " . filesize("$challenge.zip"));
 
 			$zip = new ZipArchive();
-			$zip->open("/var/www/Infra/$challenge.zip", ZipArchive::CREATE);
-			foreach (glob("/var/www/Infra/Flags/$challenge/*") as $file) {
+			$zip->open("/$challenge.zip", ZipArchive::CREATE);
+			foreach (glob("/var/www/Infra/www/Flags/$challenge/*") as $file) {
 				$zip->addFile($file);
 			}
 			$zip->close();
 
 			// Send the file to the browser
-			readfile("/var/www/Infra/$challenge.zip");
+			readfile("/$challenge.zip");
 
-			unlink("/var/www/Infra/$challenge.zip");
+			unlink("/$challenge.zip");
 		} else {
 			$result = (object) [
 				"success" => false,
