@@ -1,3 +1,6 @@
 [submodule "www/Flags"]
 	path = www/Flags
 	url = git@github.com:Ochre04/Flags.git
+[submodule "www/--force"]
+	path = www/--force
+	url = git@github.com:Ochre04/Flags.git
