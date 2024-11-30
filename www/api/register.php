@@ -79,33 +79,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 		$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-		if (is_null($row)) {
-			if ($password !== $password_confirm) {
-				$result = (object) [
-					"success" => false,
-					"msg" => "Die Passwörter stimmen nicht überein.",
-				];
-				echo json_encode($result);
-				exit();
-			}
+		#if (is_null($row)) {
+		if ($password !== $password_confirm) {
+			$result = (object) [
+				"success" => false,
+				"msg" => "Die Passwörter stimmen nicht überein.",
+			];
+			echo json_encode($result);
+			exit();
+		}
 
-			$hashed_password = password_hash($password, PASSWORD_ARGON2I);
+		$hashed_password = password_hash($password, PASSWORD_ARGON2I);
 
-			$stmt = $pdo->prepare(
-				"INSERT INTO users (username, password) VALUES (:username, :hashed_password)"
-			);
-			$stmt->bindParam(":username", $username);
-			$stmt->bindParam(":hashed_password", $hashed_password);
+		$stmt = $pdo->prepare(
+			"INSERT INTO users (username, password) VALUES (:username, :hashed_password)"
+		);
+		$stmt->bindParam(":username", $username);
+		$stmt->bindParam(":hashed_password", $hashed_password);
 
-			$stmt->execute();
-			login($pdo, $username, $password);
-		} else {
+		$stmt->execute();
+		login($pdo, $username, $password);
+		/*} else {
 			$result = (object) [
 				"success" => false,
 				"msg" => "Der Account existiert bereits.",
 			];
 			echo json_encode($result);
-		}
+		}*/
 	} else {
 		$result = (object) [
 			"success" => false,

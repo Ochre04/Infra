@@ -33,30 +33,30 @@ function login($pdo, $username, $password)
 	$stmt->execute();
 	$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	if (!is_null($row)) {
-		$password_hash = $row["password"];
-		if (password_verify($password, $password_hash)) {
-			$result = (object) [
-				"success" => true,
-				"args" => [
-					"jwt" => "nevergonna",
-				],
-			];
-			echo json_encode($result);
-		} else {
-			$result = (object) [
-				"success" => false,
-				"msg" => "Falsches Passwort.",
-			];
-			echo json_encode($result);
-		}
+	#if (!is_null($row)) {
+	$password_hash = $row["password"];
+	if (password_verify($password, $password_hash)) {
+		$result = (object) [
+			"success" => true,
+			"args" => [
+				"jwt" => "nevergonna",
+			],
+		];
+		echo json_encode($result);
 	} else {
+		$result = (object) [
+			"success" => false,
+			"msg" => "Falsches Passwort.",
+		];
+		echo json_encode($result);
+	}
+	/*} else {
 		$result = (object) [
 			"success" => false,
 			"msg" => "Benutzer existiert nicht.",
 		];
 		echo json_encode($result);
-	}
+	}*/
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
