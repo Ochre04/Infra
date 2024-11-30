@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 $db_host = "postgres";
 $db_name = "ctf";
 $db_username = "ctf";
@@ -13,45 +11,50 @@ $pdo = new PDO(
 	$db_password
 );
 
+function generateRandomString($length = 10)
+{
+	return substr(
+		str_shuffle(
+			str_repeat(
+				$x =
+					"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+				ceil($length / strlen($x))
+			)
+		),
+		1,
+		$length
+	);
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$request = json_decode(file_get_contents("php://input"), true);
 
-	if (
-		isset($request["jwt"]) &&
-		isset($request["challenge"]) &&
-		isset($request["flag"])
-	) {
+	if (isset($request["jwt"])) {
 		$jwt = $request["jwt"];
 		$challenge = $request["challenge"];
-		$flag = $request["flag"];
 
-		// TODO: JWT
 		if (true) {
 			$stmt = $pdo->prepare(
-				"SELECT * FROM active_challenges WHERE challenge=:challenge AND flag=:flag"
+				"INSERT INTO active_challenges (id, challenge, flag) VALUES (:id, :challenge, :flag)"
 			);
+
+			$id = generateRandomString();
+			$flag = generateRandomString();
+
+			$stmt->bindParam(":id", $id);
 			$stmt->bindParam(":challenge", $challenge);
 			$stmt->bindParam(":flag", $flag);
+
 			$stmt->execute();
 
-			$row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-			if (!is_null($row)) {
-				// TODO: Add challenge to history
-				$result = (object) [
-					"success" => true,
-					"args" => [
-						"challenge" => $challenge,
-					],
-				];
-				echo json_encode($result);
-			} else {
-				$result = (object) [
-					"success" => false,
-					"msg" => "Die Flag \"$flag\" für die Challenge \"$challenge\" ist nicht korrekt!",
-				];
-				echo json_encode($result);
-			}
+			$result = (object) [
+				"success" => true,
+				"args" => [
+					"id" => $id,
+				],
+			];
+			echo json_encode($result);
+			// TODO: do not start it multiple times
 		} else {
 			$result = (object) [
 				"success" => false,
@@ -67,4 +70,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		echo json_encode($result);
 	}
 }
+
 ?>
