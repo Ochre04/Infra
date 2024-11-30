@@ -43,6 +43,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
 			// Send the file to the browser
 			readfile("/var/www/ctf/$challenge.zip");
+
+			unlink("/var/www/ctf/$challenge.zip");
 		} else {
 			$result = (object) [
 				"success" => false,
